@@ -16,6 +16,10 @@ import Navbar from './components/Navbar';
 import Welcome from './components/Welcome';
 import About from './components/About';
 import Footer from './components/Footer';
+import WorkSpace from './components/Workspace';
+
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
 
 const { REACT_APP_SERVER_URL, REACT_APP_SOCKET_URL } = process.env;
 
@@ -41,6 +45,7 @@ function App() {
 
   const [currentUser, setCurrentUser] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
  
   useEffect(() => {
     // We can check if a user is authenticated if there is a token avalible in localstorage
@@ -126,23 +131,56 @@ function App() {
     }
   }
 
+  // Themeing
+  const theme = React.useMemo(
+    () =>
+      createMuiTheme({
+        palette: {
+          type: darkModeEnabled ? 'dark' : 'light',
+        },
+      }),
+    [darkModeEnabled],
+  );
+
+
   return (
     <div className="App">
-      <Navbar handleLogout={handleLogout} isAuth={isAuthenticated} />
-      <h1>MERN Authentication</h1>
-      <div className="container mt-5">
-        <Switch>
-          <Route path='/signup' component={Signup} />
-          <Route 
-            path="/login"
-            render={(props) => <Login {...props} nowCurrentUser={nowCurrentUser} setIsAuthenticated={setIsAuthenticated} user={currentUser} />}
-          />
-          <PrivateRoute path="/profile" component={Profile} user={currentUser} handleLogout={handleLogout} />
-          <Route exact path="/" component={Welcome} /> 
-          <Route exact path="/about" component={About} /> 
-        </Switch>
-      </div>
-      <Footer />
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Navbar
+          handleLogout={handleLogout}
+          darkModeEnabled={darkModeEnabled}
+          setDarkModeEnabled={setDarkModeEnabled}
+          isAuth={isAuthenticated}
+        />
+        <h1>MERN Authentication</h1>
+        <div className="container mt-5">
+          <Switch>
+            <Route path="/signup" component={Signup} />
+            <Route
+              path="/login"
+              render={(props) => (
+                <Login
+                  {...props}
+                  nowCurrentUser={nowCurrentUser}
+                  setIsAuthenticated={setIsAuthenticated}
+                  user={currentUser}
+                />
+              )}
+            />
+            <PrivateRoute
+              path="/profile"
+              component={Profile}
+              user={currentUser}
+              handleLogout={handleLogout}
+            />
+            <Route exact path="/" component={Welcome} />
+            <Route exact path="/about" component={About} />
+            <Route exact path="/workspaces" component={WorkSpace} />
+          </Switch>
+        </div>
+        <Footer />
+      </ThemeProvider>
     </div>
   );
 }
