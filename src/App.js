@@ -15,7 +15,6 @@ import Profile from  './components/Profile';
 import Navbar from './components/Navbar';
 import Welcome from './components/Welcome';
 import About from './components/About';
-import Footer from './components/Footer';
 import WorkSpace from './components/Workspace';
 
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
@@ -153,8 +152,7 @@ function App() {
           setDarkModeEnabled={setDarkModeEnabled}
           isAuth={isAuthenticated}
         />
-        <h1>MERN Authentication</h1>
-        <div className="container mt-5">
+        <div className="container mt-2">
           <Switch>
             <Route path="/signup" component={Signup} />
             <Route
@@ -179,7 +177,6 @@ function App() {
             <Route exact path="/workspaces" component={WorkSpace} />
           </Switch>
         </div>
-        <Footer />
       </ThemeProvider>
     </div>
   );
