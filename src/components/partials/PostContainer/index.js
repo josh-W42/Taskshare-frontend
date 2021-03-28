@@ -6,6 +6,9 @@ import Post from '../Post';
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
+    height: "80vh",
+    maxHeight: "100vh",
+    overflowY: "auto",
     backgroundColor: theme.palette.background.paper,
   },
   listSection: {

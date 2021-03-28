@@ -1,9 +1,12 @@
 import ResponsiveDrawer from "../partials/Drawer"
 
-const WorkSpace = () => {
+const WorkSpace = (props) => {
   return (
     <div>
-      <ResponsiveDrawer />
+      <ResponsiveDrawer
+        darkModeEnabled={props.darkModeEnabled}
+        setDarkModeEnabled={props.setDarkModeEnabled}
+      />
     </div>
   )
 }

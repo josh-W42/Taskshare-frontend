@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -17,9 +17,13 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormGroup from '@material-ui/core/FormGroup';
+import Switch from '@material-ui/core/Switch';
 import SearchBar from '../SearchBar';
 import PostContainer from '../PostContainer';
 import NavAvatar from '../NavAvatar';
+import RoomNav from '../RoomNav';
 
 const drawerWidth = 240;
 
@@ -60,7 +64,11 @@ function ResponsiveDrawer(props) {
   const { window } = props;
   const classes = useStyles();
   const theme = useTheme();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const toggleDarkMode = (e) => {
+    props.setDarkModeEnabled((prev) => !prev);
+  }
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -95,7 +103,7 @@ function ResponsiveDrawer(props) {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <AppBar position="fixed" className={classes.appBar}>
+      <AppBar color="inherit" position="fixed" className={classes.appBar}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -108,7 +116,7 @@ function ResponsiveDrawer(props) {
           </IconButton>
           <Grid item xs={9} sm={6} md={6}>
             <Typography variant="h6" noWrap>
-              Room Name Here
+              WorkSpace Name Here
             </Typography>
           </Grid>
           <Hidden xsDown>
@@ -150,11 +158,23 @@ function ResponsiveDrawer(props) {
             variant="permanent"
             open
           >
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={props.darkModeEnabled}
+                    onChange={toggleDarkMode}
+                  />
+                }
+                label="Normal"
+              />
+            </FormGroup>
             {drawer}
           </Drawer>
         </Hidden>
       </nav>
-      <main className={classes.content}>
+      <main className={classes.content}> 
+        <RoomNav />
         <PostContainer />
       </main>
     </div>

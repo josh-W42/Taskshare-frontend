@@ -152,7 +152,7 @@ function App() {
           setDarkModeEnabled={setDarkModeEnabled}
           isAuth={isAuthenticated}
         />
-        <div className="container mt-2">
+        <div className="mt-2">
           <Switch>
             <Route path="/signup" component={Signup} />
             <Route
@@ -174,7 +174,19 @@ function App() {
             />
             <Route exact path="/" component={Welcome} />
             <Route exact path="/about" component={About} />
-            <Route exact path="/workspaces" component={WorkSpace} />
+            <Route
+              exact
+              path="/workspaces"
+              render={(props) => {
+                return (
+                  <WorkSpace
+                    {...props}
+                    darkModeEnabled={darkModeEnabled}
+                    setDarkModeEnabled={setDarkModeEnabled}
+                  />
+                );
+              }}
+            />
           </Switch>
         </div>
       </ThemeProvider>

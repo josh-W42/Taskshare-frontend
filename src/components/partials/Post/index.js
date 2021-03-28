@@ -1,5 +1,3 @@
-import Avatar from '@material-ui/core/Avatar';
-import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import Grid from '@material-ui/core/Grid';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -8,25 +6,15 @@ import PostAvater from '../PostAvatar';
 import SpeedDial from '@material-ui/lab/SpeedDial';
 import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
-import FileCopyIcon from '@material-ui/icons/FileCopyOutlined';
-import SaveIcon from '@material-ui/icons/Save';
-import PrintIcon from '@material-ui/icons/Print';
-import ShareIcon from '@material-ui/icons/Share';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import EditIcon from '@material-ui/icons/Edit';
 import { useState } from 'react';
 import { makeStyles } from '@material-ui/core';
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
-import Button from '@material-ui/core/Button';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
 import ChatIcon from '@material-ui/icons/Chat';
+import AvatarPreview from '../AvatarPreview';
 
 const useStyles = makeStyles((theme) => ({
   listItem: {
     transition: "0.5s",
-    '&:hover': {
-      background: "#F5F5F5",
-    },
   },
   speedDial: {
     position: 'absolute',
@@ -86,43 +74,28 @@ const Post = (props) => {
           }
         />
         <Grid direction="row" container alignItems="center">
-          <ButtonGroup variant="text" color="primary" aria-label="text primary button group">
-            <Button>
-              <AvatarGroup max={3}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-                <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-                <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-                <Avatar alt="Agnes Walker" src="/static/images/avatar/4.jpg" />
-                <Avatar
-                  alt="Trevor Henderson"
-                  src="/static/images/avatar/5.jpg"
-                />
-              </AvatarGroup>
-              Replies
-            </Button>
-          </ButtonGroup>
-
-        <SpeedDial
-          ariaLabel="SpeedDial openIcon example"
-          className={classes.speedDial}
-          hidden={false}
-          onClick={handleDialClick}
-          icon={<SpeedDialIcon />}
-          onClose={handleClose}
-          onOpen={handleOpen}
-          open={open}
-          direction="left"
-        >
-          {actions.map((action) => (
-            <SpeedDialAction
-              key={action.name}
-              icon={action.icon}
-              tooltipTitle={action.name}
-              tooltipPlacement="bottom"
-              onClick={handleClose}
-            />
-          ))}
-        </SpeedDial>
+          <AvatarPreview message={"Replies"} />
+          <SpeedDial
+            ariaLabel="SpeedDial openIcon example"
+            className={classes.speedDial}
+            hidden={false}
+            onClick={handleDialClick}
+            icon={<SpeedDialIcon />}
+            onClose={handleClose}
+            onOpen={handleOpen}
+            open={open}
+            direction="left"
+          >
+            {actions.map((action) => (
+              <SpeedDialAction
+                key={action.name}
+                icon={action.icon}
+                tooltipTitle={action.name}
+                tooltipPlacement="bottom"
+                onClick={handleClose}
+              />
+            ))}
+          </SpeedDial>
         </Grid>
       </Grid>
     </ListItem>
