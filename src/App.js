@@ -175,7 +175,6 @@ function App() {
             <Route exact path="/" component={Welcome} />
             <Route exact path="/about" component={About} />
             <Route
-              exact
               path="/workspaces"
               render={(props) => {
                 return (

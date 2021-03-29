@@ -106,6 +106,14 @@ const RoomNav = (props) => {
         </IconButton>
         <p>Add Member(s) To Room</p>
       </MenuItem>
+      <MenuItem>
+        <IconButton aria-label="show 17 new Tasks" color="inherit">
+          <Badge badgeContent={17} color="secondary">
+            <AssignmentLateIcon />
+          </Badge>
+        </IconButton>
+        <p>Tasks</p>
+      </MenuItem>
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
           aria-label="account of current user"

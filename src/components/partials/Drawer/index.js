@@ -24,6 +24,9 @@ import SearchBar from '../SearchBar';
 import PostContainer from '../PostContainer';
 import NavAvatar from '../NavAvatar';
 import RoomNav from '../RoomNav';
+import { Route, Switch as RouterSwitch } from 'react-router';
+import PostView from '../PostView';
+
 
 const drawerWidth = 240;
 
@@ -137,7 +140,7 @@ function ResponsiveDrawer(props) {
           <Drawer
             container={container}
             variant="temporary"
-            anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+            anchor={theme.direction === "rtl" ? "right" : "left"}
             open={mobileOpen}
             onClose={handleDrawerToggle}
             classes={{
@@ -173,9 +176,22 @@ function ResponsiveDrawer(props) {
           </Drawer>
         </Hidden>
       </nav>
-      <main className={classes.content}> 
+      <main className={classes.content}>
         <RoomNav />
-        <PostContainer />
+        <RouterSwitch>
+          <Route
+            path="/workspaces/rooms"
+            render={(props) => {
+              return <PostContainer {...props} />;
+            }}
+          />
+          <Route
+            path="/workspaces/posts"
+            render={(props) => {
+              return <PostView {...props} />;
+            }}
+          />
+        </RouterSwitch>
       </main>
     </div>
   );

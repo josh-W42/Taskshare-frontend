@@ -53,7 +53,7 @@ const SearchBar = (props) => {
         <SearchIcon />
       </div>
       <InputBase
-        placeholder="Search…"
+        placeholder={"Search WorkSpace"}
         classes={{
           root: classes.inputRoot,
           input: classes.inputInput,
