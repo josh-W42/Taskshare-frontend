@@ -53,9 +53,8 @@ For this application I was very inpired by other productivity/communication appl
   - Edit the Workspace.
 
 # Wireframes:
-
-
-
+![Work space wireframe](./readme_assets/workspace.png)
+** I spent some time working on a figma wireframe but this prototype is more accurate to what I had in mind.
 
 # Data Models and ERD:
 
