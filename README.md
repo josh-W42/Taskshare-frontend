@@ -7,19 +7,19 @@ For this application I was very inpired by other productivity/communication appl
 
 # User Stories:
 
-## Authenication:
+## Authentication:
 
   * Every person that wants to access a workspace needs to be signed in and "invited" to it by reaching a specific route by browser.
   
   * However, if the user wants to demo the site, I'll make a demo workspace.
 
-  A non-authenitcated user can:
+  A non-authentication user can:
 
   - Demo TaskShare in the demo workspace.
   - Sign up for an account.
   - Log in to their account.
 
-  An authenicated user can:
+  An authenticated user can:
 
   - Logout of their account.
   - Edit their account information.
@@ -59,7 +59,7 @@ For this application I was very inpired by other productivity/communication appl
 - I plan on using the socket.io npm package, that way I can facilitate communication between connected sockets.
 - Additionally, by using socket.io's rooms, I can broadcast events to specific users that are connected to that room.
 
-## Matrial-UI:
+## Material-UI:
 - I'm learning how to use material-ui for this project.
 - I'm enjoying it so far, but using it effectively will prove to be challenge.
 
