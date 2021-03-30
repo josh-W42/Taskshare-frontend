@@ -33,7 +33,7 @@ const StyledBadge = withStyles((theme) => ({
   },
 }))(Badge);
 
-const NavAvatar = () => {
+const NavAvatar = (props) => {
   return (
     <Tooltip title="Username" aria-label="username" TransitionComponent={Fade} arrow>
       <StyledBadge

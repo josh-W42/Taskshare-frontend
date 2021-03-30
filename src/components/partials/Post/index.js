@@ -11,10 +11,12 @@ import { makeStyles } from '@material-ui/core';
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
 import ChatIcon from '@material-ui/icons/Chat';
 import AvatarPreview from '../AvatarPreview';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   listItem: {
     transition: "0.5s",
+    textDecoration: "none",
   },
   speedDial: {
     position: 'absolute',
@@ -55,7 +57,7 @@ const Post = (props) => {
           primary={
             <>
               <span>Brunch this weekend? </span>-
-              <span className="text-muted"> 4:30pm</span>
+              <span className=""> 4:30pm</span>
             </>
           }
           secondary={
@@ -74,7 +76,9 @@ const Post = (props) => {
           }
         />
         <Grid direction="row" container alignItems="center">
-          <AvatarPreview message={"Replies"} />
+          <Link className="text-decoration-none" to="/workspaces/post">
+            <AvatarPreview message={"Replies"} />
+          </Link>
           <SpeedDial
             ariaLabel="SpeedDial openIcon example"
             className={classes.speedDial}

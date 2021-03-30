@@ -5,7 +5,7 @@ import AvatarGroup from '@material-ui/lab/AvatarGroup';
 
 const AvatarPreview = (props) => {
   return (
-    <ButtonGroup variant="text" color="primary" aria-label="text primary button group">
+    <ButtonGroup variant="text" color="default" aria-label="text primary button group">
       <Button>
         <AvatarGroup max={3}>
           <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />

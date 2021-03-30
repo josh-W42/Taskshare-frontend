@@ -1,18 +1,26 @@
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
-import { useState } from 'react';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import Post from '../Post';
+import BottomAppBar from '../BottomAppBar';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
-    height: "80vh",
+    height: "76vh",
     maxHeight: "100vh",
     overflowY: "auto",
     backgroundColor: theme.palette.background.paper,
+    paddingTop: "0px",
   },
   listSection: {
     backgroundColor: 'inherit',
+  },
+  subheader: {
+    backgroundColor: theme.palette.background.paper,
+    textAlign: "center",
+    zIndex: 10,
   },
   ul: {
     backgroundColor: 'inherit',
@@ -28,7 +36,13 @@ const PostContainer = (props) => {
   const classes = useStyles();
 
   const postsArray = posts.map((post, index) => {
-    return <Post key={index} post={post} />;
+    return (
+      <React.Fragment key={index}>
+        {index === 0 && <ListSubheader className={classes.subheader}>Yesterday</ListSubheader>}
+        {index === 3 && <ListSubheader className={classes.subheader}>Today</ListSubheader>}
+        <Post post={post} />
+      </React.Fragment>
+    );
   });
 
   return (
