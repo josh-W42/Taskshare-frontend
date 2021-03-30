@@ -18,6 +18,13 @@ const useStyles = makeStyles((theme) => ({
   grow: {
     flexGrow: 1,
   },
+  appBar: props => ({
+    top: '57px',
+    [theme.breakpoints.up("sm")]: {
+      width: `calc(100% - ${props.xOffSet}px)`,
+      marginLeft: props.xOffSet,
+    },
+  }),
   inputRoot: {
     color: 'inherit',
   },
@@ -46,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const RoomNav = (props) => {
-  const classes = useStyles();
+  const classes = useStyles(props);
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
@@ -130,7 +137,7 @@ const RoomNav = (props) => {
 
   return (
     <div className={classes.grow}>
-      <AppBar color="default" position="static">
+      <AppBar className={classes.appBar} color="default" position="fixed">
         <Toolbar>
           <Typography variant="h6" noWrap>
             Room Name Here

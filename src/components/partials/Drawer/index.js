@@ -216,7 +216,7 @@ const ResponsiveDrawer = (props) => {
         </Hidden>
       </nav>
       <main className={classes.content}>
-        <RoomNav />
+        <RoomNav xOffSet={drawerWidth} />
         <RouterSwitch>
           <Route
             path="/workspaces/rooms"

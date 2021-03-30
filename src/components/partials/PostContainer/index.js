@@ -3,16 +3,19 @@ import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Post from '../Post';
-import BottomAppBar from '../BottomAppBar';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
-    height: "76vh",
-    maxHeight: "100vh",
+    height: `100vh`,
+    marginTop: "65px",
+    marginBottom: "105px",
     overflowY: "auto",
     backgroundColor: theme.palette.background.paper,
     paddingTop: "0px",
+    [theme.breakpoints.up("xxl")]: {
+      marginBottom: 0,
+    },
   },
   listSection: {
     backgroundColor: 'inherit',
@@ -31,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
 
 const PostContainer = (props) => {
 
-  const [posts, setPosts] = useState([1, 2, 3, 4, 5, 6, 7]);
+  const [posts, setPosts] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
 
   const classes = useStyles();
 
