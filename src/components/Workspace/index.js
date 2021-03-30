@@ -1,4 +1,4 @@
-import ResponsiveDrawer from "../partials/Drawer"
+import ResponsiveDrawer from "./partials/Drawer"
 
 const WorkSpace = (props) => {
   return (
