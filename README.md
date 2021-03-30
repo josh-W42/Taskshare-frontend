@@ -61,7 +61,7 @@ For this application I was very inpired by other productivity/communication appl
 
 ## Matrial-UI:
 - I'm learning how to use material-ui for this project.
-- I enjoy it so far, but using it effectively will prove to be challenge.
+- I'm enjoying it so far, but using it effectively will prove to be challenge.
 
 ## Markdown:
 - I also had an idea to use a lightweight markdown parser and compiler from [marked](https://marked.js.org/).
