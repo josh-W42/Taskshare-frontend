@@ -11,10 +11,7 @@ import './App.css';
 // Components
 import Signup from './components/Signup';
 import Login from './components/Login';
-import Profile from  './components/Profile';
 import Navbar from './components/Navbar';
-import Welcome from './components/Welcome';
-import About from './components/About';
 import WorkSpace from './components/Workspace';
 
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
@@ -166,14 +163,12 @@ function App() {
                 />
               )}
             />
-            <PrivateRoute
+            {/* <PrivateRoute
               path="/profile"
               component={Profile}
               user={currentUser}
               handleLogout={handleLogout}
-            />
-            <Route exact path="/" component={Welcome} />
-            <Route exact path="/about" component={About} />
+            /> */}
             <Route
               path="/workspaces"
               render={(props) => {
