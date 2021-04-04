@@ -1,6 +1,7 @@
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormGroup from "@material-ui/core/FormGroup";
 import Switch from "@material-ui/core/Switch";
+import Tooltip from '@material-ui/core/Tooltip';
 
 const LightDarkSwitch = (props) => {
 
@@ -14,18 +15,22 @@ const LightDarkSwitch = (props) => {
     props.setDarkModeEnabled((prev) => !prev);
   };
 
+  
+
   return (
-    <FormGroup>
-      <FormControlLabel
-        control={
-          <Switch
-            checked={props.darkModeEnabled}
-            onChange={toggleDarkMode}
-          />
-        }
-        label={props.darkModeEnabled ? "Dark" : "Light"}
-      />
-    </FormGroup>
+    <Tooltip title="Toggle Theme" aria-label="Theme Toggler" arrow>
+      <FormGroup>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={props.darkModeEnabled}
+              onChange={toggleDarkMode}
+            />
+          }
+          label={props.darkModeEnabled ? "Dark" : "Light"}
+        />
+      </FormGroup>
+    </Tooltip>
   );
 }
 

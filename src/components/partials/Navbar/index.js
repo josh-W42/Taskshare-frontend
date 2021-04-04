@@ -33,7 +33,7 @@ const Navbar = (props) => {
         <>
           <Button color="inherit">Workspaces</Button>
           <NavLink className={classes.link} to="/profile">
-            <Button color="inherit">User Profile</Button>
+            <Button>User Profile</Button>
           </NavLink>
         </>
       );
@@ -41,10 +41,10 @@ const Navbar = (props) => {
       return (
         <>
           <NavLink className={classes.link} to="/signup">
-            <Button color="inherit">Signup</Button>
+            <Button>Signup</Button>
           </NavLink>
           <NavLink className={classes.link} to="/login">
-            <Button color="inherit">Login</Button>
+            <Button>Login</Button>
           </NavLink>
         </>
       );
