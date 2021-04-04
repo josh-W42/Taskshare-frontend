@@ -19,7 +19,8 @@ import FormControl from '@material-ui/core/FormControl';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import FilledInput from '@material-ui/core/FilledInput';
-import { Grid } from "@material-ui/core";
+import TextField from '@material-ui/core/TextField';
+import Grid from "@material-ui/core/Grid";
 
 const { REACT_APP_SERVER_URL } = process.env;
 
@@ -38,7 +39,10 @@ const useStyles = makeStyles((theme) => ({
   },
   formControl: {
     width: "100%",
-    margin: theme.spacing(1)
+    margin: theme.spacing(1),
+    // '&:focus': {
+    //   color: "default"
+    // }
   },
   link: {
     color: "inherit",
@@ -106,18 +110,19 @@ const Login = (props) => {
         <Typography className="mt-3" component="h2" variant="h5" gutterBottom>
           Welcome Back
         </Typography>
-        <form className={classes.fillWidth}>
+        <form className={classes.fillWidth} autoComplete="off" onSubmit={handleSubmit}>
           <CardContent>
-            <FormControl className={classes.formControl} variant="filled">
+            <FormControl color="secondary" className={classes.formControl} variant="filled">
               <InputLabel htmlFor="filled-email">Email</InputLabel>
               <FilledInput
                 id="filled-email"
                 type="text"
+                required
                 value={email}
                 onChange={handleEmail}
               />
             </FormControl>
-            <FormControl className={classes.formControl} variant="filled">
+            <FormControl color="secondary" className={classes.formControl} variant="filled">
               <InputLabel htmlFor="filed-adornment-password">
                 Password
               </InputLabel>
@@ -125,6 +130,7 @@ const Login = (props) => {
                 id="filed-adornment-password"
                 type={showPassword ? "text" : "password"}
                 value={password}
+                required
                 onChange={handlePassword}
                 endAdornment={
                   <InputAdornment position="end">
@@ -160,7 +166,6 @@ const Login = (props) => {
               <Grid item>
                 <Button
                   type="submit"
-                  onClick={handleSubmit}
                   variant="contained"
                 >
                   Login
