@@ -13,7 +13,7 @@ const Signup = (props) => {
 
     // ok so in this instance, we'll do form validation when submitting
     // as opposed to when it's changed. Personally, I'd like to make checks
-    // as the user so changing state, espcially for larger forms.
+    // as the user so changing state, especially for larger forms.
     const handleSubmit = async (e) => {
         e.preventDefault();
 

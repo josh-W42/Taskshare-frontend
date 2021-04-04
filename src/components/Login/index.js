@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import { Redirect } from 'react-router-dom';
-import setAuthToken from '../utils/setAuthToken';
+import setAuthToken from '../../utils/setAuthToken';
 const { REACT_APP_SERVER_URL } = process.env;
 
 const Login = (props) => {
@@ -38,7 +38,7 @@ const Login = (props) => {
             // decode token to get the user data..
             // So I'm guessing this is just decoding a user's session data from encryption.
             const decoded = jwt_decode(token);
-            // thne set the currnet user.
+            // then set the current user.
             props.nowCurrentUser(decoded); // function passed down from the props.
         } catch (error) {
             console.error(error);

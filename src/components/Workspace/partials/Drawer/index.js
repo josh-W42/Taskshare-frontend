@@ -11,9 +11,6 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormGroup from "@material-ui/core/FormGroup";
-import Switch from "@material-ui/core/Switch";
 import SearchBar from "../SearchBar";
 import PostContainer from "../PostContainer";
 import NavAvatar from "../NavAvatar";
@@ -30,6 +27,7 @@ import Avatar from '@material-ui/core/Avatar';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import Badge from '@material-ui/core/Badge';
 import BottomAppBar from "../BottomAppBar";
+import LightDarkSwitch from "../../../partials/LightDarkSwitch";
 
 
 const drawerWidth = 240;
@@ -77,10 +75,6 @@ const ResponsiveDrawer = (props) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [rooms, setRooms] = useState([1, 2, 3]);
   const [directMessages, setDirectMessages] = useState([1, 2]);
-
-  const toggleDarkMode = (e) => {
-    props.setDarkModeEnabled((prev) => !prev);
-  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -200,17 +194,10 @@ const ResponsiveDrawer = (props) => {
             variant="permanent"
             open
           >
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={props.darkModeEnabled}
-                    onChange={toggleDarkMode}
-                  />
-                }
-                label={props.darkModeEnabled ? "Dark" : "Light"}
-              />
-            </FormGroup>
+            <LightDarkSwitch
+              setDarkModeEnabled={props.setDarkModeEnabled}
+              darkModeEnabled={props.darkModeEnabled}
+            />
             {drawer}
           </Drawer>
         </Hidden>

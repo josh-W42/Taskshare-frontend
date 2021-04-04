@@ -11,11 +11,12 @@ import './App.css';
 // Components
 import Signup from './components/Signup';
 import Login from './components/Login';
-import Navbar from './components/Navbar';
+import Navbar from './components/partials/Navbar';
 import WorkSpace from './components/Workspace';
 
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import LandingPage from './components/LandingPage';
 
 const { REACT_APP_SERVER_URL, REACT_APP_SOCKET_URL } = process.env;
 
@@ -35,16 +36,22 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
   }} />
 };
 
+// finds the theme preference if they set it before.
+const themePreference = () => {
+  if (localStorage.getItem('theme')) {
+    return localStorage.getItem('theme') === 'Dark' ? true : false;
+  }
+  return false
+}
 
 function App() {
   // Set state values
-
   const [currentUser, setCurrentUser] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(true);
-  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
+  const [darkModeEnabled, setDarkModeEnabled] = useState(themePreference());
  
   useEffect(() => {
-    // We can check if a user is authenticated if there is a token avalible in localstorage
+    // We can check if a user is authenticated if there is a token available in localstorage
     // We do this every time the app is mounted.
     
     // Auth specific stuff
@@ -145,12 +152,13 @@ function App() {
         <CssBaseline />
         <Navbar
           handleLogout={handleLogout}
+          isAuth={isAuthenticated}
           darkModeEnabled={darkModeEnabled}
           setDarkModeEnabled={setDarkModeEnabled}
-          isAuth={isAuthenticated}
         />
         <div className="mt-2">
           <Switch>
+            <Route exact path="/" component={LandingPage} />
             <Route path="/signup" component={Signup} />
             <Route
               path="/login"
