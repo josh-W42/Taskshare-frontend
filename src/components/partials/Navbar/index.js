@@ -35,6 +35,7 @@ const Navbar = (props) => {
           <NavLink className={classes.link} to="/profile">
             <Button>User Profile</Button>
           </NavLink>
+          <Button color="inherit" onClick={props.handleLogout}>Logout</Button>
         </>
       );
     } else {

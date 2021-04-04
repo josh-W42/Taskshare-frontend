@@ -10,6 +10,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 import jwt_decode from 'jwt-decode';
 import setAuthToken from './utils/setAuthToken';
 import io from 'socket.io-client';
+import axios from "axios";
 
 // CSS
 import './App.css';
@@ -25,8 +26,10 @@ const { REACT_APP_SERVER_URL, REACT_APP_SOCKET_URL } = process.env;
 
 // Sockets
 const socket = io(REACT_APP_SOCKET_URL, {
-  autoConnect: false
+  autoConnect: false,
+  reconnection: false,
 });
+
 // We don't want to automatically connect when
 // they arrive, we want to connect when they login
 
@@ -131,10 +134,12 @@ function App() {
     if (!localToken) {
       setIsAuthenticated(false);
     } else {
-      socket.connect();
       token = jwt_decode(localToken);
       setAuthToken(localToken);
       setCurrentUser(token);
+      if (!socket.connected) {
+        socket.connect();
+      }
     }
   }, []);
 
@@ -144,7 +149,8 @@ function App() {
       console.log('hi');
     });
     socket.on('disconnect', () => {
-      console.log('bye')
+      console.log('bye');
+      createNotification("warning", "Disconnected From Server");
     });
     socket.on('message', (data) => {
       console.log(data);
@@ -157,42 +163,25 @@ function App() {
 
 
   const nowCurrentUser = (userData) => {
-    setCurrentUser(userData);
-    setIsAuthenticated(true);
-    socket.connect();
+    getUserData(userData);
   }
 
+  const getUserData = async userData => {
+    const url = `${REACT_APP_SERVER_URL}/users/${userData.id}/profile`;
 
-  // Useful for later
-  // const getUserData = token => {
-  //   let url = '';
-  //   if (token.type === 'user') {
-  //     url = `${REACT_APP_SERVER_URL}/users/${token.id}/private`;
-  //   } else if (token.type === 'restaurant') {
-  //     url = `${REACT_APP_SERVER_URL}/restaurants/${token.id}/private`;
-  //   }
-
-  //   axios
-  //     .get(url)
-  //     .then((response) => {
-  //       let data = response.data;
-  //       if (token.type === 'user') {
-  //         data.user.type = token.type;
-  //         data = data.user;
-  //       } else if (token.type === 'restaurant') {
-  //         data.restaurant.type = token.type;
-  //         data = data.restaurant;
-  //       }
-  //       setCurrentUser(data);
-  //       setIsAuthenticated(true);
-  //     })
-  //     .catch((error) => {
-  //       console.log("===> Error When Getting User Data", error);
-  //       createNotification("error", "Could Not Get User!");
-  //       setCurrentUser(token);
-  //       setIsAuthenticated(true);
-  //     });
-  // }
+    try {
+      const response = await axios.get(url);
+      let user = response.data.result;
+      setCurrentUser(user);
+      setIsAuthenticated(true);
+      socket.userId = user._id;
+      socket.connect();
+    } catch (error) {
+      console.log("===> Error When Getting User Data", error);
+      createNotification("error", "Could Not Connect With DataBase, Safely Logging You Out.");
+      handleLogout();
+    }
+  }
 
   const handleLogout = () => {
     if (localStorage.getItem('jwtToken')) { 
@@ -200,6 +189,8 @@ function App() {
       setCurrentUser(null);
       setIsAuthenticated(false);
       socket.disconnect();
+
+      createNotification("info", "Successfully Logged Out");
     }
   }
 
@@ -224,11 +215,24 @@ function App() {
           isAuth={isAuthenticated}
           darkModeEnabled={darkModeEnabled}
           setDarkModeEnabled={setDarkModeEnabled}
+          user={currentUser}
         />
         <div className="mt-2">
           <Switch>
             <Route exact path="/" component={LandingPage} />
-            <Route path="/signup" component={Signup} />
+            <Route 
+              path="/signup"
+              render={(props) => (
+                <Signup
+                  {...props}
+                  createNotification={createNotification}
+                  nowCurrentUser={nowCurrentUser}
+                  setIsAuthenticated={setIsAuthenticated}
+                  handleLogout={handleLogout}
+                  user={currentUser}
+                />
+              )}
+            />
             <Route
               path="/login"
               render={(props) => (
@@ -253,6 +257,8 @@ function App() {
                 return (
                   <WorkSpace
                     {...props}
+                    user={currentUser}
+                    createNotification={createNotification}
                     darkModeEnabled={darkModeEnabled}
                     setDarkModeEnabled={setDarkModeEnabled}
                   />

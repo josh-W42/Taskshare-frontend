@@ -19,7 +19,6 @@ import FormControl from '@material-ui/core/FormControl';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import FilledInput from '@material-ui/core/FilledInput';
-import TextField from '@material-ui/core/TextField';
 import Grid from "@material-ui/core/Grid";
 
 const { REACT_APP_SERVER_URL } = process.env;
@@ -40,9 +39,6 @@ const useStyles = makeStyles((theme) => ({
   formControl: {
     width: "100%",
     margin: theme.spacing(1),
-    // '&:focus': {
-    //   color: "default"
-    // }
   },
   link: {
     color: "inherit",
@@ -81,24 +77,20 @@ const Login = (props) => {
         `${REACT_APP_SERVER_URL}/users/login`,
         userData
       );
-      console.log(response);
-
+      // Get Token
       const { token } = response.data;
-      // Take th token from the response from the backend and put it
-      // The local storage of the user's browser. We do this because we
-      // want to be able to get the token when a redirect occurs.
       localStorage.setItem("jwtToken", token);
-
-      // Ok and now we se the auth token
+      // Put token in axios auth header
       setAuthToken(token);
-      // decode token to get the user data..
-      // So I'm guessing this is just decoding a user's session data from encryption.
+      
+      // decode the token
       const decoded = jwt_decode(token);
-      // then set the current user.
-      props.nowCurrentUser(decoded); // function passed down from the props.
+
+      // set the current user
+      props.nowCurrentUser(decoded);
+      props.createNotification("success", "Login Successful");
     } catch (error) {
-      console.error(error);
-      props.createNotification("error", "Either Your Email or Password is Incorrect.")
+      props.createNotification("error", "Either Email or Password is Incorrect.")
     }
   };
 
@@ -106,7 +98,7 @@ const Login = (props) => {
 
   return (
     <Container className="text-center mt-5" maxWidth="sm">
-      <Card variant="outlined">
+      <Card variant="elevation" elevation={3}>
         <Typography className="mt-3" component="h2" variant="h5" gutterBottom>
           Welcome Back
         </Typography>
@@ -116,7 +108,7 @@ const Login = (props) => {
               <InputLabel htmlFor="filled-email">Email</InputLabel>
               <FilledInput
                 id="filled-email"
-                type="text"
+                type="email"
                 required
                 value={email}
                 onChange={handleEmail}
