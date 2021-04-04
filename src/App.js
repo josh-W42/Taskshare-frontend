@@ -136,7 +136,7 @@ function App() {
     } else {
       token = jwt_decode(localToken);
       setAuthToken(localToken);
-      setCurrentUser(token);
+      nowCurrentUser(token);
       if (!socket.connected) {
         socket.connect();
       }
@@ -211,6 +211,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Navbar
+          createNotification={createNotification}
           handleLogout={handleLogout}
           isAuth={isAuthenticated}
           darkModeEnabled={darkModeEnabled}
