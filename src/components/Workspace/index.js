@@ -96,6 +96,7 @@ const WorkSpace = (props) => {
       <ResponsiveDrawer
         workspace={workspace}
         member={member}
+        isLoadingData={props.isLoadingData}
         isLoadingWorkspace={isLoadingWorkspace}
         darkModeEnabled={props.darkModeEnabled}
         setDarkModeEnabled={props.setDarkModeEnabled}

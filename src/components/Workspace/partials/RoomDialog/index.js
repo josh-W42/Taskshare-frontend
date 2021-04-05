@@ -13,7 +13,6 @@ import FormControl from '@material-ui/core/FormControl';
 import FilledInput from '@material-ui/core/FilledInput';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
-import { Redirect, useHistory } from 'react-router-dom';
 
 const { REACT_APP_SERVER_URL } = process.env;
 
@@ -23,8 +22,7 @@ const RoomDialog = (props) => {
   const [open, setOpen] = useState(false);
   const [permissions, setPermissions] = useState(props.permissions);
   const [role, setRole] = useState(props.role);
-  
-  const history = useHistory();
+
 
   const toggleOpen = () => {
     setOpen((prev) => !prev);

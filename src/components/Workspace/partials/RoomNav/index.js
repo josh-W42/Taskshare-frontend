@@ -1,5 +1,11 @@
+// Imports
 import { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+
+// Component
+import AvatarPreview from '../AvatarPreview';
+
+// Material-UI
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -11,8 +17,8 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import AssignmentLateIcon from '@material-ui/icons/AssignmentLate';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
-import AvatarPreview from '../AvatarPreview';
 import Tooltip from '@material-ui/core/Tooltip';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -77,6 +83,30 @@ const RoomNav = (props) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+  if (props.isLoadingRoom) {
+    return (
+      <div className={classes.grow}>
+        <AppBar className={classes.appBar} color="default" position="fixed">
+          <Toolbar>
+            <Typography variant="h6" noWrap>
+                <Skeleton variant="rect" width={200} height={40} />
+            </Typography>
+            <div className={classes.grow} />
+            <div className={classes.sectionDesktop}>
+              <Skeleton className="mx-1" variant="rect" width={200} height={40} />
+              <Skeleton className="mx-1" variant="circle" width={40} height={40} />
+              <Skeleton className="mx-1" variant="circle" width={40} height={40} />
+              <Skeleton className="mx-1" variant="circle" width={40} height={40} />
+            </div>
+            <div className={classes.sectionMobile}>
+              <Skeleton variant="circle" width={40} height={40} />
+            </div>
+          </Toolbar>
+        </AppBar>
+      </div>
+    );
+  }
+  
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
@@ -93,6 +123,7 @@ const RoomNav = (props) => {
     </Menu>
   );
 
+
   const mobileMenuId = 'primary-search-account-menu-mobile';
   const renderMobileMenu = (
     <Menu
@@ -105,7 +136,7 @@ const RoomNav = (props) => {
       onClose={handleMobileMenuClose}
     >
       <MenuItem>
-        <AvatarPreview message="Members" />
+        <AvatarPreview members={props.room.members} message="Members" />
       </MenuItem>
       <MenuItem>
         <IconButton aria-label="new person" color="inherit">
@@ -140,13 +171,13 @@ const RoomNav = (props) => {
       <AppBar className={classes.appBar} color="default" position="fixed">
         <Toolbar>
           <Typography variant="h6" noWrap>
-            Room Name Here
+            { props.room.name }
           </Typography>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
             <Tooltip title="View All Members" aria-label="add">
               <div>
-                <AvatarPreview message="Members" />
+                <AvatarPreview members={props.room.members} message="Members" />
               </div>
             </Tooltip>
             <Tooltip title="Add Member(s) to Room" aria-label="add">
@@ -155,8 +186,8 @@ const RoomNav = (props) => {
               </IconButton>
             </Tooltip>
             <Tooltip title="Tasks" aria-label="add">
-              <IconButton aria-label="show 17 new Tasks" color="inherit">
-                <Badge badgeContent={17} color="secondary">
+              <IconButton aria-label="show new Tasks" color="inherit">
+                <Badge badgeContent={props.room.tasks.length} color="secondary">
                   <AssignmentLateIcon />
                 </Badge>
               </IconButton>

@@ -300,8 +300,16 @@ const ResponsiveDrawer = (props) => {
         <RouterSwitch>
           <Route
             path="/workspaces/:wId/rooms/:rId"
-            render={(props) => {
-              return <PostContainer {...props} xOffSet={drawerWidth} />;
+            render={(RenderProps) => {
+              return (
+                <PostContainer
+                  {...RenderProps}
+                  socket={props.socket}
+                  createNotification={props.createNotification}
+                  isLoadingData={props.isLoadingData}
+                  xOffSet={drawerWidth}
+                />
+              );
             }}
           />
           <Route

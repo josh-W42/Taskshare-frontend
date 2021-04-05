@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+// Imports
+import React, { useEffect, useState } from 'react';
+import { Redirect, useParams } from "react-router";
 import { makeStyles } from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
-import ListSubheader from '@material-ui/core/ListSubheader';
+import axios from 'axios';
+
+// Components
 import Post from '../Post';
+import SkeletonPost from '../SkeletonPost';
 import BottomAppBar from '../BottomAppBar';
 import RoomNav from '../RoomNav';
+
+// Material-UI Components
+import List from '@material-ui/core/List';
+import ListSubheader from '@material-ui/core/ListSubheader';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,29 +42,152 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const PostContainer = (props) => {
+const { REACT_APP_SERVER_URL } = process.env;
 
-  const [posts, setPosts] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+
+const PostContainer = (props) => {
+  
+  const [room, setRoom] = useState(null);
+  const [posts, setPosts] = useState([1, 2, 3, 4, 5, 6]);
+  const [redirect, setRedirect] = useState(false);
+  const [redirectTo, setRedirectTo] = useState('/');
+  const [isLoadingRoom, setIsLoadingRoom] = useState(true);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(true);
+
 
   const classes = useStyles();
 
-  const postsArray = posts.map((post, index) => {
-    return (
-      <React.Fragment key={index}>
-        {index === 0 && <ListSubheader className={classes.subheader}>Yesterday</ListSubheader>}
-        {index === 3 && <ListSubheader className={classes.subheader}>Today</ListSubheader>}
-        <Post post={post} />
-      </React.Fragment>
-    );
+  // Url Parameters
+  // wId - Workspace id
+  // rId = room id
+  const { wId, rId } = useParams();
+
+  useEffect(() => {
+    // We have to get the room
+    if (!props.isLoadingData) {
+      if (!room) {
+        getRoom(rId);
+      } else {
+        getAllPosts(rId);
+      }
+    }
+  }, [props.isLoadingData, room])
+
+
+  const getRoom = async (id) => {
+    const url = `${REACT_APP_SERVER_URL}/rooms/${rId}`;
+
+    try {
+      // Get the room data
+      const response = await axios.get(url);
+      const room = response.data.result;
+      // And store the room, and state non-loading status
+      setRoom(room);
+      setIsLoadingRoom(false);
+    } catch (error) {
+      if (error.response.status === 403) {
+        setTimeout(() => {
+          props.createNotification("error", "You Do Not Have Access To That Room");
+        }, 1000)
+        setRedirectTo(`/workspaces/${wId}`);
+      } else if (error.response.status === 401) {
+        setTimeout(() => {
+          props.createNotification("error", "You Must Log In To Access Workspaces And Rooms");
+        }, 1000)
+        setRedirectTo('/login');
+      } else {
+        setTimeout(() => {
+          props.createNotification("error", "Room Does Not Exist.");
+        }, 1000)
+        setRedirectTo(`/workspaces/${wId}`);
+      }
+      setRedirect(true);
+    }
+  }
+
+  const getAllPosts = async id => {
+    const url = `${REACT_APP_SERVER_URL}/rooms/${rId}/allPosts`;
+
+    try {
+      // Get All Posts
+      const response = await axios.get(url);
+      const posts = response.data.results;
+      // store posts
+      setPosts(posts);
+      // Change The a Loading State of Posts
+      setIsLoadingPosts(false);
+    } catch (error) {
+      setTimeout(() => {
+        props.createNotification("error", "Room Does Not Exist.");
+      }, 1000);
+      setRedirectTo(`/workspaces/${wId}`);
+      setRedirect(true);
+    }
+  }
+
+  if (redirect) {
+    return <Redirect to={redirectTo} />
+  }
+
+  // real-time get new posts
+  props.socket.on('newContent', (data) => {
+    console.log(data);
   });
+
+  const postsArray = () => {
+    const array = [];
+    let lastSubheader = -1;
+
+    for (let i = 0; i < posts.length; i++) {
+      // if loading just push skeletons
+      if (isLoadingPosts) {
+        array.push(
+          <React.Fragment key={`post-skel-${i}`}>
+            <SkeletonPost />
+          </React.Fragment>
+        );
+      } else {
+        // figure out the subheaders
+        const timeNow = Date.now();
+        let timePosted = posts[i].createdAt;
+        timePosted = new Date(timePosted);
+        // 1000 milliseconds * 60 seconds * 60 minutes * 24 hours = 86400000 milliseconds to 1 Day.
+        const dayDiff = Math.floor((timeNow - timePosted) / 86400000);
+
+        if (dayDiff !== lastSubheader) {
+          array.push(<ListSubheader key={`subheader-${posts[i]._id}`} className={classes.subheader}>{timePosted.toDateString()}</ListSubheader>)
+          lastSubheader = dayDiff;
+        }
+
+        let twelveHourFormat = 'AM'
+        let formattedHour = (timePosted.getHours() + 1);
+        if (formattedHour > 12) {
+          formattedHour = formattedHour - 12;
+          twelveHourFormat = 'PM'
+        } else if (formattedHour === 12) {
+          twelveHourFormat = 'PM'
+        }
+
+        const time = `${formattedHour}:${timePosted.getMinutes()} ${twelveHourFormat}`;
+      
+        array.push(
+          <React.Fragment key={posts[i]._id}>
+            <Post time={time} post={posts[i]} />
+          </React.Fragment>
+        );
+      }
+    }
+
+    return array;
+  };
 
   return (
     <div className={classes.root}>
-      <RoomNav xOffSet={props.xOffSet} />
+      <RoomNav room={room} isLoadingRoom={isLoadingRoom} xOffSet={props.xOffSet} />
       <List className={classes.root}>
-        {postsArray}
+        {postsArray()}
       </List>
-      <BottomAppBar xOffSet={props.xOffSet} />
+      <BottomAppBar room={room} isLoadingRoom={isLoadingRoom} xOffSet={props.xOffSet} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import ProfileIcon from "../ProfileIcon";
 
-const PostAvater = () => {
+const PostAvatar = () => {
   return (
     <>
       <ProfileIcon />
@@ -8,4 +8,4 @@ const PostAvater = () => {
   )
 }
 
-export default PostAvater;
+export default PostAvatar;

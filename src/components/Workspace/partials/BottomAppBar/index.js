@@ -9,6 +9,7 @@ import Grid from '@material-ui/core/Grid';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import SendIcon from '@material-ui/icons/Send';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 const useStyles = makeStyles((theme) => ({
   appBar: props => ({
@@ -29,6 +30,33 @@ const useStyles = makeStyles((theme) => ({
 const BottomAppBar = (props) => {
   const classes = useStyles(props);
 
+  if (props.isLoadingRoom) {
+    return (
+      <AppBar position="fixed" color="default" className={classes.appBar}>
+        <Toolbar>
+          <Grid
+            container
+            direction="column"
+          >
+            <Grid item xs>
+              <Skeleton variant="rect" height={50} />
+            </Grid>
+            <Grid container justify="space-between">
+              <Grid item xs>
+                <Skeleton variant="rect" height={50} width={100} />
+              </Grid>
+              <Grid item xs className={"text-end"}>
+                <ToggleButtonGroup aria-label="text formatting">
+                  <Skeleton variant="rect" height={50} width={100} />
+                </ToggleButtonGroup>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Toolbar>
+      </AppBar>
+    );
+  }
+
   return (
     <AppBar position="fixed" color="default" className={classes.appBar}>
       <Toolbar>
@@ -39,7 +67,7 @@ const BottomAppBar = (props) => {
           <Grid item xs>
             <TextField
               id="filled-textarea"
-              label="Message to Room Name"
+              label={`Post to ${props.room.name}`}
               multiline
               fullWidth
               variant="filled"
