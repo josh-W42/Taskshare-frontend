@@ -22,6 +22,11 @@ const useStyles = makeStyles((theme) => ({
   menuButton: {
     marginRight: theme.spacing(2),
   },
+  button: {
+    '&:hover': {
+      background: 'inherit',
+    },
+  },
   grow: {
     flexGrow: 1,
   },
@@ -94,12 +99,12 @@ const Navbar = (props) => {
       return (
         <MenuItem key={workspace._id} onClick={handleMenuClose}>
           <NavLink className={classes.link} to={`/workspaces/${workspace._id}`}>
-            {workspace.name}
+            <Button className={classes.button}>{workspace.name}</Button>
           </NavLink>
         </MenuItem>
       );
     } else {
-      return <></>
+      return <div key={`Null Error - ${index}`}></div>
     }
   });
 
@@ -136,17 +141,17 @@ const Navbar = (props) => {
       { props.isAuth ? (
         <div>
           <MenuItem onClick={handleProfileMenuOpen}>
-            <Button color="inherit">Workspaces</Button>
+            <Button className={classes.button} color="inherit">Workspaces</Button>
           </MenuItem>
           <MenuItem>
             <NavLink className={classes.link} to="/profile">
-              <Button>
+              <Button className={classes.button}>
                 User Profile
               </Button>
             </NavLink>
           </MenuItem>
           <MenuItem>
-            <Button color="inherit" onClick={props.handleLogout}>Logout</Button>
+            <Button className={classes.button} color="inherit" onClick={props.handleLogout}>Logout</Button>
           </MenuItem>
         </div>
       ) : (

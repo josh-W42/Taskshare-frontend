@@ -27,7 +27,9 @@ const { REACT_APP_SERVER_URL, REACT_APP_SOCKET_URL } = process.env;
 // Sockets
 const socket = io(REACT_APP_SOCKET_URL, {
   autoConnect: false,
-  reconnection: false,
+  reconnectionAttempts: 10,
+  reconnectionDelay: 10000,
+  reconnectionDelayMax: 10000,
 });
 
 // We don't want to automatically connect when
@@ -40,11 +42,24 @@ function Alert(props) {
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
   let token = localStorage.getItem('jwtToken');
-  return <Route {...rest} render={(props) => {
-    // Ok so basically this is saying if there is a token AKA
-    // If they are logged in we route 
-    return token ? <Component {...rest} {...props} /> : <Redirect to="/login"/>;
-  }} />
+  return (
+    <Route
+      {...rest}
+      render={(props) => {
+        if (token) {
+          return <Component {...rest} {...props} />
+        } else {
+          setTimeout(() => {
+            rest.createNotification(
+              "error",
+              "You Need To Be Logged In To View That Page"
+            );
+          }, 500);
+          return <Redirect to="/login" />;
+        }
+      }}
+    />
+  );
 };
 
 // finds the theme preference if they set it before.
@@ -60,6 +75,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [darkModeEnabled, setDarkModeEnabled] = useState(themePreference());
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
   // Snack Bar stuff
   const [notifications, setNotifications] = useState([]);
@@ -132,6 +148,7 @@ function App() {
     const localToken = localStorage.getItem('jwtToken');
 
     if (!localToken) {
+      setIsLoadingData(false);
       setIsAuthenticated(false);
     } else {
       token = jwt_decode(localToken);
@@ -163,6 +180,7 @@ function App() {
 
 
   const nowCurrentUser = (userData) => {
+    setIsLoadingData(true);
     getUserData(userData);
   }
 
@@ -174,8 +192,12 @@ function App() {
       let user = response.data.result;
       setCurrentUser(user);
       setIsAuthenticated(true);
-      socket.userId = user._id;
-      socket.connect();
+
+      setIsLoadingData(false);
+
+      if (!socket.connected) {
+        socket.connect();
+      }
     } catch (error) {
       console.log("===> Error When Getting User Data", error);
       createNotification("error", "Could Not Connect With DataBase, Safely Logging You Out.");
@@ -246,25 +268,17 @@ function App() {
                 />
               )}
             />
-            {/* <PrivateRoute
-              path="/profile"
-              component={Profile}
+            <PrivateRoute
+              path="/workspaces/:id"
+              socket={socket}
+              isLoadingData={isLoadingData}
+              createNotification={createNotification}
               user={currentUser}
+              darkModeEnabled={darkModeEnabled}
+              isAuth={isAuthenticated}
               handleLogout={handleLogout}
-            /> */}
-            <Route
-              path="/workspaces"
-              render={(props) => {
-                return (
-                  <WorkSpace
-                    {...props}
-                    user={currentUser}
-                    createNotification={createNotification}
-                    darkModeEnabled={darkModeEnabled}
-                    setDarkModeEnabled={setDarkModeEnabled}
-                  />
-                );
-              }}
+              setDarkModeEnabled={setDarkModeEnabled}
+              component={WorkSpace}
             />
           </Switch>
         </div>
