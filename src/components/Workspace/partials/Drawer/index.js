@@ -1,5 +1,17 @@
-import { useState } from "react";
+// Imports
+import { useEffect, useState } from "react";
+import { Route, Switch as RouterSwitch } from "react-router";
+import { NavLink } from "react-router-dom";
 import PropTypes from "prop-types";
+
+// Components
+import SearchBar from "../SearchBar";
+import PostContainer from "../PostContainer";
+import NavAvatar from "../NavAvatar";
+import PostView from "../PostView";
+import LightDarkSwitch from "../../../partials/LightDarkSwitch";
+
+// Material-Ui
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Divider from "@material-ui/core/Divider";
@@ -11,12 +23,6 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import SearchBar from "../SearchBar";
-import PostContainer from "../PostContainer";
-import NavAvatar from "../NavAvatar";
-import RoomNav from "../RoomNav";
-import { Route, Switch as RouterSwitch } from "react-router";
-import PostView from "../PostView";
 import NestedNavList from "../NestedNavList";
 import GroupIcon from "@material-ui/icons/Group";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
@@ -26,8 +32,11 @@ import QuestionAnswerSharpIcon from '@material-ui/icons/QuestionAnswerSharp';
 import Avatar from '@material-ui/core/Avatar';
 import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import Badge from '@material-ui/core/Badge';
-import BottomAppBar from "../BottomAppBar";
-import LightDarkSwitch from "../../../partials/LightDarkSwitch";
+import Skeleton from '@material-ui/lab/Skeleton';
+import AddIcon from '@material-ui/icons/Add';
+import { Button } from "@material-ui/core";
+import RoomDialog from "../RoomDialog";
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 
 
 const drawerWidth = 240;
@@ -65,6 +74,14 @@ const useStyles = makeStyles((theme) => ({
   },
   nested: {
     paddingLeft: theme.spacing(4),
+    width: '100%',
+  },
+  link: {
+    color: "inherit",
+    width: '100%',
+    '&:hover': {
+      color: "inherit"
+    },
   },
 }));
 
@@ -73,27 +90,83 @@ const ResponsiveDrawer = (props) => {
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [rooms, setRooms] = useState([1, 2, 3]);
-  const [directMessages, setDirectMessages] = useState([1, 2]);
+  const [rooms, setRooms] = useState([1, 2, 3, 4]);
+  const [directMessages, setDirectMessages] = useState([1, 2, 3, 4]);
+
+  useEffect(() => {
+    // wait until workspace and member data finfishes loading
+    if (!props.isLoadingWorkspace) {
+      // set the rooms the member is in
+      sortRooms();
+    }
+  }, [props.isLoadingWorkspace])
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  const sortRooms = () => {
+    const roomObject = props.member.rooms;
+    const messages = [];
+    const rooms = [];
+    for (const id in roomObject) {
+      const room = roomObject[id];
+      room.id = id;
+      if (roomObject[id].isAMessageRoom) {
+        messages.push(room);
+      } else {        
+        rooms.push(room);
+      }
+    }
+    setRooms(rooms);
+    setDirectMessages(messages);
+  }
+
   const roomArray = rooms.map((room, index) => {
+
+    if (props.isLoadingWorkspace) {
+      return (
+        <ListItem key={`room-${index}`} button className={classes.nested}>
+          <Skeleton variant="rect" width={200} height={25} />
+        </ListItem>
+      );
+    }
     return (
       <ListItem key={`room-${index}`} button className={classes.nested}>
-        <ListItemIcon>          
-          <Badge badgeContent={index + 1} color="secondary">
-            <QuestionAnswerSharpIcon />
-          </Badge>
-        </ListItemIcon>
-        <ListItemText primary="Room Name" />
+        <NavLink className={classes.link} to={`/workspaces/${props.workspace._id}/rooms/${room.id}`} >
+          <Grid container justify="space-between" alignItems="center">
+            <Grid item>
+              <ListItemIcon>
+                <Badge badgeContent={0} color="secondary">
+                  {
+                    room.isPrivate ? (
+                      <VisibilityOffIcon />
+                    ) : (
+                      <QuestionAnswerSharpIcon />
+                    )
+                  }
+                </Badge>
+              </ListItemIcon>
+            </Grid>
+            <Grid item >
+              <ListItemText primary={room.name} />
+            </Grid>
+          </Grid>
+        </NavLink>
       </ListItem>
     );
   });
 
   const dmArray = directMessages.map((messageRoom, index) => {
+
+    if (props.isLoadingWorkspace) {
+      return (
+        <ListItem key={`room-${index}`} button className={classes.nested}>
+          <Skeleton variant="rect" width={200} height={25} />
+        </ListItem>
+      );
+    }    
+
     return (
       <ListItem key={`messageRoom-${index}`} button className={classes.nested}>
         <ListItemIcon>
@@ -119,12 +192,28 @@ const ResponsiveDrawer = (props) => {
     <div>
       <div className={classes.toolbar} />
       <Divider />
+      { props.isLoadingWorkspace ? (
+        <ListItem>
+          <Skeleton variant="rect" width={200} height={25} />
+        </ListItem>
+      ) : (
+        <RoomDialog
+          permissions={props.member.permissions}
+          role={props.member.role}
+          workspaceId={props.workspace._id}
+          createNotification={props.createNotification}
+        />
+      )}
       <NestedNavList
         category="Rooms"
         mainIcon={<GroupIcon />}
         listItems={roomArray}
       />
       <Divider />
+      <Button className="w-100">
+        <AddIcon />
+        New Message
+      </Button>
       <NestedNavList
         category="Messages"
         mainIcon={<GroupIcon />}
@@ -135,6 +224,7 @@ const ResponsiveDrawer = (props) => {
 
   const container =
     window !== undefined ? () => window().document.body : undefined;
+
 
   return (
     <div className={classes.root}>
@@ -152,7 +242,11 @@ const ResponsiveDrawer = (props) => {
           </IconButton>
           <Grid item xs={9} sm={6} md={6}>
             <Typography variant="h6" noWrap>
-              WorkSpace Name Here
+              {props.isLoadingWorkspace ? (
+                <Skeleton variant="rect" width={200} height={25} />
+              ) : (
+                props.workspace.name
+              )}
             </Typography>
           </Grid>
           <Hidden xsDown>
@@ -162,7 +256,7 @@ const ResponsiveDrawer = (props) => {
           </Hidden>
           <Hidden smDown>
             <Grid item xs={1}>
-              <NavAvatar />
+              <NavAvatar socket={props.socket} />
             </Grid>
           </Hidden>
         </Toolbar>
@@ -203,22 +297,20 @@ const ResponsiveDrawer = (props) => {
         </Hidden>
       </nav>
       <main className={classes.content}>
-        <RoomNav xOffSet={drawerWidth} />
         <RouterSwitch>
           <Route
-            path="/workspaces/rooms"
+            path="/workspaces/:wId/rooms/:rId"
             render={(props) => {
-              return <PostContainer {...props} />;
+              return <PostContainer {...props} xOffSet={drawerWidth} />;
             }}
           />
           <Route
             path="/workspaces/post"
             render={(props) => {
-              return <PostView {...props} />;
+              return <PostView {...props} xOffSet={drawerWidth} />;
             }}
           />
         </RouterSwitch>
-        <BottomAppBar xOffSet={drawerWidth} />
       </main>
     </div>
   );

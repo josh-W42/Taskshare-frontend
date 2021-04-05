@@ -3,13 +3,15 @@ import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Post from '../Post';
+import BottomAppBar from '../BottomAppBar';
+import RoomNav from '../RoomNav';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
-    height: `100vh`,
-    marginTop: "65px",
-    marginBottom: "105px",
+    height: `80vh`,
+    marginTop: "20px",
+    marginBottom: "5vh",
     overflowY: "auto",
     backgroundColor: theme.palette.background.paper,
     paddingTop: "0px",
@@ -49,9 +51,13 @@ const PostContainer = (props) => {
   });
 
   return (
-    <List className={classes.root}>
-      {postsArray}
-    </List>
+    <div className={classes.root}>
+      <RoomNav xOffSet={props.xOffSet} />
+      <List className={classes.root}>
+        {postsArray}
+      </List>
+      <BottomAppBar xOffSet={props.xOffSet} />
+    </div>
   );
 }
 

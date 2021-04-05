@@ -12,6 +12,7 @@ const WorkSpace = (props) => {
   const [member, setMember] = useState(null);
   const [redirect, setRedirect] = useState(false);
   const [redirectTo, setRedirectTo] = useState('/');
+  const [isLoadingWorkspace, setIsLoadingWorkspace] = useState(true);
 
   const { id } = useParams();
 
@@ -20,11 +21,13 @@ const WorkSpace = (props) => {
     if (!props.isLoadingData) {
       if (!workspace) {
         getWorkspace(id);
-      } else {
+      } else if (!member) {
         getMember(id);
+      } else {
+        connectToRooms();
       }
     }
-  }, [props.isLoadingData, workspace])
+  }, [props.isLoadingData, workspace, member])
 
   // retrieves workspace data
   const getWorkspace = async id => {
@@ -63,8 +66,8 @@ const WorkSpace = (props) => {
       const result = response.data.result;
       setMember(result);
 
-      // Connect the socket to all available rooms.
-      connectToRooms();
+      // Once the member has been successfully loaded, then loading is complete.
+      setIsLoadingWorkspace(false);
     } catch (error) {
       setTimeout(() => {
         props.createNotification("error", "An Error Occurred When Retrieving Your Data, Please Try Again.");
@@ -93,10 +96,12 @@ const WorkSpace = (props) => {
       <ResponsiveDrawer
         workspace={workspace}
         member={member}
+        isLoadingWorkspace={isLoadingWorkspace}
         darkModeEnabled={props.darkModeEnabled}
         setDarkModeEnabled={props.setDarkModeEnabled}
         createNotification={props.createNotification}
         user={props.user}
+        socket={props.socket}
         isAuth={props.isAuthenticated}
         handleLogout={props.handleLogout}
       />
