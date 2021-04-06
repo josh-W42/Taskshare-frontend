@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -7,7 +7,13 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { Container, Grid } from "@material-ui/core"
 import Wave from 'react-wavify';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Redirect } from 'react-router-dom';
+import axios from 'axios';
+import setAuthToken from '../../utils/setAuthToken';
+import jwt_decode from "jwt-decode";
+
+
+
 
 
 const useStyles = makeStyles({
@@ -30,9 +36,68 @@ const useStyles = makeStyles({
   },
 });
 
+const { REACT_APP_SERVER_URL, REACT_APP_DEMO_ID } = process.env;
+
 const LandingPage = (props) => {
   const classes = useStyles();
 
+  const [redirect, setRedirect] = useState(false);
+  const [redirectTo, setRedirectTo] = useState('/');
+  
+  const handleDemo = async () => {
+    const registerUrl = `${REACT_APP_SERVER_URL}/users/register`;
+    
+    if (props.isAuth) {
+      try {
+        const addWorkspaceUrl = `${REACT_APP_SERVER_URL}/users/${props.user._id}/addWorkSpace/${REACT_APP_DEMO_ID}`;
+        const resWorkspace = await axios.put(addWorkspaceUrl);
+      } catch (error) {
+        console.log("Connecting to demo");
+      } 
+      setRedirectTo(`/workspaces/${REACT_APP_DEMO_ID}`);
+      setRedirect(true);
+    } else {
+
+      const randomizer = Math.floor(Math.random() * 60000) + 1;
+      
+      const guestData = {
+        firstName: `Guest-${randomizer}`,
+        lastName: '',
+        email: `Guest${randomizer}@guest.com`,
+        password: 'password',
+        isGuest: true,
+      }
+      
+      try {
+        const resRegister = await axios.post(registerUrl, guestData);
+        
+        // Get Token
+        const { token, data } = resRegister.data;
+        localStorage.setItem("jwtToken", token);
+        // Put token in axios auth header
+        setAuthToken(token);
+        // decode the token
+        const decoded = jwt_decode(token);
+        // set the current user
+        props.nowCurrentUser(decoded);
+        props.createNotification("success", "Guest Account Made, Connecting To Workspace.");
+        
+        const addWorkspaceUrl = `${REACT_APP_SERVER_URL}/users/${data.id}/addWorkSpace/${REACT_APP_DEMO_ID}`;
+        const resWorkspace = await axios.put(addWorkspaceUrl);
+  
+        setRedirectTo(`/workspaces/${REACT_APP_DEMO_ID}`);
+        setRedirect(true);
+        
+      } catch (error) {
+        props.createNotification("error", "An Error Occurred, Please Try Again.");
+      }
+    }
+  }
+
+  if (redirect) {
+    return <Redirect to={redirectTo} />
+  }
+  
   return (
     <div className="mt-5">
       <Grid container justify="center" alignItems="center">
@@ -60,9 +125,7 @@ const LandingPage = (props) => {
                   <NavLink className={classes.link} to="/signup">
                     <Button size="large">Sign Up</Button>
                   </NavLink>
-                  <NavLink className={classes.link} to="/demo">
-                    <Button size="large">Demo</Button>
-                  </NavLink>
+                  <Button onClick={handleDemo} size="large">Demo</Button>
                 </Grid>
               </CardActions>
             </Card>

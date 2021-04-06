@@ -234,7 +234,18 @@ function App() {
         />
         <div className="mt-2">
           <Switch>
-            <Route exact path="/" component={LandingPage} />
+            <Route exact path="/" render={(props) => {
+              return (
+                <LandingPage
+                  {...props}
+                  createNotification={createNotification}
+                  nowCurrentUser={nowCurrentUser}
+                  setIsAuthenticated={setIsAuthenticated}
+                  isAuth={isAuthenticated}
+                  user={currentUser}
+                />
+              );
+            }} />
             <Route 
               path="/signup"
               render={(props) => (
