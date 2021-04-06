@@ -49,7 +49,7 @@ const { REACT_APP_SERVER_URL } = process.env;
 const PostContainer = (props) => {
   
   const [room, setRoom] = useState(null);
-  const [posts, setPosts, getPosts] = useState([1, 2, 3, 4, 5, 6]);
+  const [posts, setPosts] = useState([1, 2, 3, 4, 5, 6]);
   const [redirect, setRedirect] = useState(false);
   const [redirectTo, setRedirectTo] = useState('/');
   const [isLoadingRoom, setIsLoadingRoom] = useState(true);
@@ -104,9 +104,13 @@ const PostContainer = (props) => {
       props.socket.on('newContent', (data) => {
         addToPosts(data);
       });
+      props.socket.on('deleteContent', (id) => {
+        removeFromPosts(id);
+      });
     }
       return () => {
         props.socket.off('newContent');
+        props.socket.off('deleteContent');
       }
     }, [isLoadingPosts])
     
@@ -114,6 +118,12 @@ const PostContainer = (props) => {
   const addToPosts = async (data) => {
     setPosts((posts) => {
       return posts.concat([data]);
+    });
+  }
+
+  const removeFromPosts = async id => {
+    setPosts((posts) => {
+      return posts.filter((post) => post._id !== id);
     });
   }
 
@@ -187,11 +197,10 @@ const PostContainer = (props) => {
         );
       } else {
         // figure out the subheaders
-        const timeNow = Date.now();
         let timePosted = posts[i].createdAt;
         timePosted = new Date(timePosted);
         // 1000 milliseconds * 60 seconds * 60 minutes * 24 hours = 86400000 milliseconds to 1 Day.
-        const dayDiff = Math.floor((timeNow - timePosted) / 86400000);
+        const dayDiff = timePosted.toDateString();
 
         if (dayDiff !== lastSubheader) {
           array.push(<ListSubheader key={`subheader-${posts[i]._id}`} className={classes.subheader}>{timePosted.toDateString()}</ListSubheader>)
@@ -199,19 +208,33 @@ const PostContainer = (props) => {
         }
 
         let twelveHourFormat = 'AM'
-        let formattedHour = (timePosted.getHours() + 1);
+        let formattedHour = (timePosted.getHours());
         if (formattedHour > 12) {
           formattedHour = formattedHour - 12;
-          twelveHourFormat = 'PM'
+          twelveHourFormat = 'PM';
         } else if (formattedHour === 12) {
           twelveHourFormat = 'PM'
+        } else if (formattedHour === 0) {
+          formattedHour = 12
+          twelveHourFormat = 'AM'
         }
 
-        const time = `${formattedHour}:${timePosted.getMinutes()} ${twelveHourFormat}`;
+        let formattedMinutes = timePosted.getMinutes();
+        if (formattedMinutes < 10) {
+          formattedMinutes = `0${formattedMinutes}`;
+        }
+
+        const time = `${formattedHour}:${formattedMinutes} ${twelveHourFormat}`;
       
         array.push(
           <React.Fragment key={posts[i]._id}>
-            <Post time={time} post={posts[i]} />
+            <Post
+              time={time}
+              socket={props.socket}
+              createNotification={props.createNotification}
+              post={posts[i]}
+              member={props.member}
+            />
           </React.Fragment>
         );
       }

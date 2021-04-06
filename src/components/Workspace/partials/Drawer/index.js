@@ -314,6 +314,7 @@ const ResponsiveDrawer = (props) => {
               return (
                 <PostContainer
                   {...RenderProps}
+                  member={props.member}
                   socket={props.socket}
                   createNotification={props.createNotification}
                   isLoadingData={props.isLoadingData}
@@ -323,7 +324,7 @@ const ResponsiveDrawer = (props) => {
             }}
           />
           <Route
-            path="/workspaces/post"
+            path="/workspaces/:wId/rooms/:rId/post/:pId"
             render={(props) => {
               return <PostView {...props} xOffSet={drawerWidth} />;
             }}
