@@ -40,7 +40,6 @@ const useStyles = makeStyles((theme) => ({
 const actions = [  
   { icon: <DeleteForeverIcon />, name: 'Delete' },
   { icon: <EditIcon />, name: 'Edit' },
-  { icon: <ChatIcon />, name: 'Reply' },
   { icon: <InsertEmoticonIcon />, name: 'Add Reaction' },
 ];
 
@@ -90,6 +89,30 @@ const Post = (props) => {
     }
   }
 
+  const deleteComment = async () => {
+    const url = `${REACT_APP_SERVER_URL}/comments/${props.post._id}/delete`;
+
+    try {
+      const response = await axios.delete(url);
+      props.createNotification("success", "Comment Deleted");
+
+      // Emit to server
+      props.socket.emit('delete post', props.post);
+    } catch (error) {
+      if (error.response.status === 403) {
+        props.createNotification("error", "Invalid Permissions");
+      } else if (error.response.status === 401) {
+        setTimeout(() => {
+          props.createNotification("error", "You Must Log In To Do That");
+        }, 1000)
+        setRedirectTo('/login');
+        setRedirect(true);
+      } else {
+        props.createNotification("error", "An Error Occurred.");
+      }
+    }
+  }
+
   const handleAction = (option) => {
     switch (option) {
       case 'Reply':
@@ -99,10 +122,18 @@ const Post = (props) => {
         props.createNotification("warning", "Not Implemented Yet!");
         break;
       case 'Delete':
-        if (props.member._id === props.post.posterId || props.member.role.includes('admin')) {
-          deletePost();
+        if (props.isComment) {
+          if (props.member._id === props.post.posterId || props.member.role.includes('admin')) {
+            deleteComment();
+          } else {
+            props.createNotification("error", "You Can Only Delete Comments You Make!");
+          }
         } else {
-          props.createNotification("error", "You Can Only Delete Posts You Make!");
+          if (props.member._id === props.post.posterId || props.member.role.includes('admin')) {
+            deletePost();
+          } else {
+            props.createNotification("error", "You Can Only Delete Posts You Make!");
+          }
         }
         break;
       case 'Add Reaction':
@@ -123,7 +154,7 @@ const Post = (props) => {
   }
 
   return (
-    <ListItem className={classes.listItem} alignItems="flex-start">
+    <ListItem className={props.topMargin} alignItems="flex-start">
       <ListItemAvatar>
         <PostAvatar poster={props.post.poster} />
       </ListItemAvatar>
@@ -144,18 +175,18 @@ const Post = (props) => {
           }
         />
         <Grid direction="row" container alignItems="center">
-          <Link className="text-decoration-none" to="/workspaces/post">
-            <Button>
-              {
-                props.post.comments.length < 1 ? (
-                  'Reply'
-                ) : (
-                  `${props.post.comments.length} Replies`
-                )
-              }
-            </Button>
-            {/* <AvatarPreview members={props.post.comments} message={"Replies"} /> */}
-          </Link>
+          {
+            props.isComment ? (
+              <></>
+            ) : (
+              <Link className="text-decoration-none" to={`/workspaces/${props.post.workspaceId}/rooms/${props.post.roomId}/posts/${props.post._id}`}>
+                <Button>
+                  Replies
+                </Button>
+                {/* <AvatarPreview members={props.post.comments} message={"Replies"} /> */}
+              </Link>
+            )
+          }
           <SpeedDial
             ariaLabel="SpeedDial openIcon example"
             className={classes.speedDial}

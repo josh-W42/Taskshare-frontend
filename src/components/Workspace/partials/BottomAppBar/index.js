@@ -61,19 +61,25 @@ const BottomAppBar = (props) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const url = `${REACT_APP_SERVER_URL}/posts/create`;
-
-    const postData = {
-      textContent,
-      roomId: props.room._id,
+    let url = ''
+    let postData = {
+      textContent
     };
+
+    if (props.isComment) {
+      url = `${REACT_APP_SERVER_URL}/comments/create`;
+      postData.postId = props.post._id;
+    } else {
+      url = `${REACT_APP_SERVER_URL}/posts/create`;
+      postData.roomId = props.room._id;
+    }
 
     try {
       const response = await axios.post(url, postData);
-      const newPost = response.data.post;
+      let newPost = props.isComment ? response.data.comment : response.data.post;
 
       // Emit to server
-      props.socket.emit('new post', newPost);
+      props.socket.emit('new post', { newPost, isComment: props.isComment ? true : false, });
     } catch (error) {
       if (error.response.status === 403) {
         setTimeout(() => {
@@ -111,7 +117,7 @@ const BottomAppBar = (props) => {
             <Grid item xs={11}>
               <TextField
                 id="filled-textarea"
-                label={`Post to ${props.room.name}`}
+                label={ props.isComment ? `Comment on post` : `Post to ${props.room.name}` }
                 multiline
                 fullWidth
                 value={textContent}

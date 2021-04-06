@@ -8,7 +8,6 @@ import PropTypes from "prop-types";
 import SearchBar from "../SearchBar";
 import PostContainer from "../PostContainer";
 import NavAvatar from "../NavAvatar";
-import PostView from "../PostView";
 import LightDarkSwitch from "../../../partials/LightDarkSwitch";
 
 // Material-Ui
@@ -309,6 +308,22 @@ const ResponsiveDrawer = (props) => {
       <main className={classes.content}>
         <RouterSwitch>
           <Route
+            path="/workspaces/:wId/rooms/:rId/posts/:pId"
+            render={(RenderProps) => {
+              return (
+                <PostContainer
+                  {...RenderProps}
+                  xOffSet={drawerWidth}
+                  member={props.member}
+                  socket={props.socket}
+                  createNotification={props.createNotification}
+                  isLoadingData={props.isLoadingData}
+                  handleLogout={props.handleLogout}
+                />
+              );
+            }}
+          />
+          <Route
             path="/workspaces/:wId/rooms/:rId"
             render={(RenderProps) => {
               return (
@@ -318,15 +333,10 @@ const ResponsiveDrawer = (props) => {
                   socket={props.socket}
                   createNotification={props.createNotification}
                   isLoadingData={props.isLoadingData}
+                  handleLogout={props.handleLogout}
                   xOffSet={drawerWidth}
                 />
               );
-            }}
-          />
-          <Route
-            path="/workspaces/:wId/rooms/:rId/post/:pId"
-            render={(props) => {
-              return <PostView {...props} xOffSet={drawerWidth} />;
             }}
           />
         </RouterSwitch>

@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     height: `90vh`,
     maxHeight: `90vh`,
-    marginTop: "20px",
+    marginTop: "25px",
     marginBottom: "5vh",
     overflowY: "auto",
     backgroundColor: theme.palette.background.paper,
@@ -54,8 +54,10 @@ const PostContainer = (props) => {
   const [redirectTo, setRedirectTo] = useState('/');
   const [isLoadingRoom, setIsLoadingRoom] = useState(true);
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
+  const [isLoadingPost, setIsLoadingPost] = useState(true);
   const [path, setPath] = useState(props.location.pathname);
   const [lastRoom, setLastRoom] = useState(null);
+  const [onePost, setOnePost] = useState(null);
 
 
   const classes = useStyles();
@@ -63,18 +65,27 @@ const PostContainer = (props) => {
   // Url Parameters
   // wId - Workspace id
   // rId = room id
-  const { wId, rId } = useParams();
-
+  // pId = post id - if viewing a post
+  const { wId, rId, pId } = useParams();
+  
   useEffect(() => {
     // We have to get the room
     if (!props.isLoadingData) {
       if (!room) {
         getRoom(rId);
       } else {
-        getAllPosts(rId);
-        const id = `${rId}-room`;
-        props.socket.emit("join room", { id });
-        setLastRoom(id);
+        if (pId) {
+          getAllComments(pId);
+          const id = `${pId}-room`;
+          props.socket.emit("join room", { id });
+          setLastRoom(id);
+          getPost(pId);
+        } else {
+          getAllPosts(rId);
+          const id = `${rId}-room`;
+          props.socket.emit("join room", { id });
+          setLastRoom(id);
+        }
       }
     }
   }, [props.isLoadingData, room])
@@ -83,15 +94,24 @@ const PostContainer = (props) => {
     // If Your viewing a room and use navigation to get to another room
     // You need to get the room data again
     if (path !== props.location.pathname) {
+
       setIsLoadingRoom(true)
       setIsLoadingPosts(true);
       getRoom(rId);
-      getAllPosts(rId);
       setPath(props.location.pathname);
-
+      
       // Also, you need to leave the old posting room and join a new one
       props.socket.emit('leave room', { id: lastRoom });
-      const id = `${rId}-room`;
+      let id = '';
+
+      if (pId) {
+        getAllComments(pId);
+        id = `${pId}-room`;
+      } else {
+        getAllPosts(rId);
+        id = `${rId}-room`;
+      }
+      
       props.socket.emit('join room', { id });
       setLastRoom(id);
 
@@ -129,7 +149,7 @@ const PostContainer = (props) => {
 
 
   const getRoom = async (id) => {
-    const url = `${REACT_APP_SERVER_URL}/rooms/${rId}`;
+    const url = `${REACT_APP_SERVER_URL}/rooms/${id}`;
 
     try {
       // Get the room data
@@ -160,7 +180,7 @@ const PostContainer = (props) => {
   }
 
   const getAllPosts = async id => {
-    const url = `${REACT_APP_SERVER_URL}/rooms/${rId}/allPosts`;
+    const url = `${REACT_APP_SERVER_URL}/rooms/${id}/allPosts`;
 
     try {
       // Get All Posts
@@ -179,8 +199,76 @@ const PostContainer = (props) => {
     }
   }
 
+  const getAllComments = async id => {
+    const url = `${REACT_APP_SERVER_URL}/posts/${id}/allComments`;
+
+    try {
+      // Get All Posts
+      const response = await axios.get(url);
+      const posts = response.data.results;
+      // store posts
+      setPosts(posts);
+      // Change The a Loading State of Posts
+      setIsLoadingPosts(false);
+    } catch (error) {
+      setTimeout(() => {
+        props.createNotification("error", "Post Does Not Exist.");
+      }, 1000);
+      setRedirectTo(`/workspaces/${wId}/rooms/${rId}`);
+      setRedirect(true);
+    }
+  }
+
+  const getPost = async id => {
+    const url = `${REACT_APP_SERVER_URL}/posts/${id}`;
+
+    try {
+      // Get All Posts
+      const response = await axios.get(url);
+      const post = response.data.result;
+      
+      // store post
+
+      let timePosted = post.createdAt;
+      timePosted = new Date(timePosted);
+      post.time = formatTime(timePosted);
+      
+      setOnePost(post);
+
+      setIsLoadingPost(false);
+    } catch (error) {
+      setTimeout(() => {
+        props.createNotification("error", "Post Does Not Exist.");
+      }, 1000);
+      setRedirectTo(`/workspaces/${wId}/rooms/${rId}`);
+      setRedirect(true);
+    }
+  }
+
   if (redirect) {
     return <Redirect to={redirectTo} />
+  }
+
+  const formatTime = (timePosted) => {
+
+    let twelveHourFormat = 'AM'
+    let formattedHour = (timePosted.getHours());
+    if (formattedHour > 12) {
+      formattedHour = formattedHour - 12;
+      twelveHourFormat = 'PM';
+    } else if (formattedHour === 12) {
+      twelveHourFormat = 'PM'
+    } else if (formattedHour === 0) {
+      formattedHour = 12
+      twelveHourFormat = 'AM'
+    }
+    
+    let formattedMinutes = timePosted.getMinutes();
+    if (formattedMinutes < 10) {
+      formattedMinutes = `0${formattedMinutes}`;
+    }
+    
+    return `${formattedHour}:${formattedMinutes} ${twelveHourFormat}`;
   }
 
   const postsArray = () => {
@@ -207,28 +295,12 @@ const PostContainer = (props) => {
           lastSubheader = dayDiff;
         }
 
-        let twelveHourFormat = 'AM'
-        let formattedHour = (timePosted.getHours());
-        if (formattedHour > 12) {
-          formattedHour = formattedHour - 12;
-          twelveHourFormat = 'PM';
-        } else if (formattedHour === 12) {
-          twelveHourFormat = 'PM'
-        } else if (formattedHour === 0) {
-          formattedHour = 12
-          twelveHourFormat = 'AM'
-        }
-
-        let formattedMinutes = timePosted.getMinutes();
-        if (formattedMinutes < 10) {
-          formattedMinutes = `0${formattedMinutes}`;
-        }
-
-        const time = `${formattedHour}:${formattedMinutes} ${twelveHourFormat}`;
+        const time = formatTime(timePosted);
       
         array.push(
           <React.Fragment key={posts[i]._id}>
             <Post
+              isComment={pId ? true : false}
               time={time}
               socket={props.socket}
               createNotification={props.createNotification}
@@ -248,11 +320,29 @@ const PostContainer = (props) => {
       <RoomNav
         room={room}
         isLoadingRoom={isLoadingRoom}
+        handleLogout={props.handleLogout}
         xOffSet={props.xOffSet}
       />
-      <List id="scrollTarget" className={classes.root}>{postsArray()}</List>
+      {
+        pId && !isLoadingPost ? (
+          <Post
+            topMargin="mt-5"
+            isComment={pId ? true : false}
+            time={onePost.time}
+            socket={props.socket}
+            createNotification={props.createNotification}
+            post={onePost}
+            member={props.member}            
+          />
+        ) : (
+          <></>
+        )
+      }
+      <List className={classes.root}>{postsArray()}</List>
       <BottomAppBar
+        isComment={pId ? true : false}
         room={room}
+        post={onePost}
         socket={props.socket}
         isLoadingRoom={isLoadingRoom}
         xOffSet={props.xOffSet}

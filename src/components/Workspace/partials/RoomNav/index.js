@@ -19,6 +19,7 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import Tooltip from '@material-ui/core/Tooltip';
 import Skeleton from '@material-ui/lab/Skeleton';
+import { NavLink } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -33,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
   }),
   inputRoot: {
     color: 'inherit',
+    textDecoration: "none",
   },
   inputInput: {
     padding: theme.spacing(1, 1, 1, 0),
@@ -106,8 +108,13 @@ const RoomNav = (props) => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <MenuItem>
+        <NavLink className={classes.inputRoot} to="/">
+          Home
+        </NavLink>
+      </MenuItem>
       <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={props.handleLogout}>Logout</MenuItem>
     </Menu>
   );
 
@@ -133,8 +140,8 @@ const RoomNav = (props) => {
         <p>Add Member(s) To Room</p>
       </MenuItem>
       <MenuItem>
-        <IconButton aria-label="show 17 new Tasks" color="inherit">
-          <Badge badgeContent={17} color="secondary">
+        <IconButton aria-label="show Tasks" color="inherit">
+          <Badge badgeContent={0} color="secondary">
             <AssignmentLateIcon />
           </Badge>
         </IconButton>

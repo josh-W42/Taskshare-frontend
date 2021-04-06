@@ -144,11 +144,9 @@ const Navbar = (props) => {
             <Button className={classes.button} color="inherit">Workspaces</Button>
           </MenuItem>
           <MenuItem>
-            <NavLink className={classes.link} to="/profile">
-              <Button className={classes.button}>
-                User Profile
-              </Button>
-            </NavLink>
+            <Button className={classes.button}>
+              User Profile
+            </Button>
           </MenuItem>
           <MenuItem>
             <Button className={classes.button} color="inherit" onClick={props.handleLogout}>Logout</Button>
@@ -196,11 +194,9 @@ const Navbar = (props) => {
               >
                 Workspaces
               </Button>
-              <NavLink className={classes.link} to="/profile">
-                <Button>
-                  User Profile
-                </Button>
-              </NavLink>
+              <Button>
+                User Profile
+              </Button>
               <Button color="inherit" onClick={props.handleLogout}>Logout</Button>
             </>
           ) : (
