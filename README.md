@@ -1,4 +1,4 @@
-# TaskSare: A Productivity Web Application
+# TaskShare: A Productivity Web Application
 
 ## About:
 TaskShare is a full stack web application built using the MERN stack. It allows teams to communicate by text in real-time and delegate routine tasks.
