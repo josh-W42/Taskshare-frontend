@@ -35,8 +35,16 @@ const NavAvatar = (props) => {
     },
   }))(Badge);
 
+  const displayName = () => {
+    if (props.member.nickName) {
+      return props.member.nickName;
+    } else {
+      return `${props.member.firstName} ${props.member.lastName}`;
+    }
+  }
+
   return (
-    <Tooltip title="Username" aria-label="username" TransitionComponent={Fade} arrow>
+    <Tooltip title={displayName()} aria-label="username" TransitionComponent={Fade} arrow>
       <StyledBadge
       overlap="circle"
       anchorOrigin={{
@@ -45,7 +53,7 @@ const NavAvatar = (props) => {
       }}
       variant="dot"
       >
-        <ProfileIcon />
+        <ProfileIcon person={props.member} />
       </StyledBadge>
     </Tooltip>
   )

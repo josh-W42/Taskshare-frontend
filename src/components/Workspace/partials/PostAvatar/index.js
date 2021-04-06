@@ -1,9 +1,9 @@
 import ProfileIcon from "../ProfileIcon";
 
-const PostAvatar = () => {
+const PostAvatar = (props) => {
   return (
     <>
-      <ProfileIcon />
+      <ProfileIcon person={props.poster} />
     </>
   )
 }

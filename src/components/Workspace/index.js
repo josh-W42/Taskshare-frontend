@@ -79,11 +79,12 @@ const WorkSpace = (props) => {
   // connects the socket to all rooms originally in
   const connectToRooms = async () => {
     // First Join The workspace
-    props.socket.emit("join room", { workspace: id });
+    props.socket.emit("join room", { id });
 
     // Then Join all the rooms and Messages They had Originally Joined
     for (const key in member.rooms) {
-      props.socket.emit("join room", { id: key });
+      const id = `${key}-notification`;
+      props.socket.emit("join room", { id });
     }
   }
 

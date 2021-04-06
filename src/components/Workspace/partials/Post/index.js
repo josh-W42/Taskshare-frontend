@@ -58,7 +58,7 @@ const Post = (props) => {
   return (
     <ListItem className={classes.listItem} alignItems="flex-start">
       <ListItemAvatar>
-        <PostAvatar />
+        <PostAvatar poster={props.post.poster} />
       </ListItemAvatar>
       <Grid container direction="column">
         <ListItemText

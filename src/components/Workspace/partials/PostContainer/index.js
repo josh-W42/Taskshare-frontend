@@ -17,7 +17,8 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
-    height: `80vh`,
+    height: `90vh`,
+    maxHeight: `90vh`,
     marginTop: "20px",
     marginBottom: "5vh",
     overflowY: "auto",
@@ -48,11 +49,13 @@ const { REACT_APP_SERVER_URL } = process.env;
 const PostContainer = (props) => {
   
   const [room, setRoom] = useState(null);
-  const [posts, setPosts] = useState([1, 2, 3, 4, 5, 6]);
+  const [posts, setPosts, getPosts] = useState([1, 2, 3, 4, 5, 6]);
   const [redirect, setRedirect] = useState(false);
   const [redirectTo, setRedirectTo] = useState('/');
   const [isLoadingRoom, setIsLoadingRoom] = useState(true);
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
+  const [path, setPath] = useState(props.location.pathname);
+  const [lastRoom, setLastRoom] = useState(null);
 
 
   const classes = useStyles();
@@ -69,9 +72,50 @@ const PostContainer = (props) => {
         getRoom(rId);
       } else {
         getAllPosts(rId);
+        const id = `${rId}-room`;
+        props.socket.emit("join room", { id });
+        setLastRoom(id);
       }
     }
   }, [props.isLoadingData, room])
+  
+  useEffect(() => {
+    // If Your viewing a room and use navigation to get to another room
+    // You need to get the room data again
+    if (path !== props.location.pathname) {
+      setIsLoadingRoom(true)
+      setIsLoadingPosts(true);
+      getRoom(rId);
+      getAllPosts(rId);
+      setPath(props.location.pathname);
+
+      // Also, you need to leave the old posting room and join a new one
+      props.socket.emit('leave room', { id: lastRoom });
+      const id = `${rId}-room`;
+      props.socket.emit('join room', { id });
+      setLastRoom(id);
+
+    }
+  }, [props.location])
+
+  useEffect(() => {
+    // real-time get new posts
+    if (!isLoadingPosts) {
+      props.socket.on('newContent', (data) => {
+        addToPosts(data);
+      });
+    }
+      return () => {
+        props.socket.off('newContent');
+      }
+    }, [isLoadingPosts])
+    
+    
+  const addToPosts = async (data) => {
+    setPosts((posts) => {
+      return posts.concat([data]);
+    });
+  }
 
 
   const getRoom = async (id) => {
@@ -129,11 +173,6 @@ const PostContainer = (props) => {
     return <Redirect to={redirectTo} />
   }
 
-  // real-time get new posts
-  props.socket.on('newContent', (data) => {
-    console.log(data);
-  });
-
   const postsArray = () => {
     const array = [];
     let lastSubheader = -1;
@@ -183,11 +222,18 @@ const PostContainer = (props) => {
 
   return (
     <div className={classes.root}>
-      <RoomNav room={room} isLoadingRoom={isLoadingRoom} xOffSet={props.xOffSet} />
-      <List className={classes.root}>
-        {postsArray()}
-      </List>
-      <BottomAppBar room={room} isLoadingRoom={isLoadingRoom} xOffSet={props.xOffSet} />
+      <RoomNav
+        room={room}
+        isLoadingRoom={isLoadingRoom}
+        xOffSet={props.xOffSet}
+      />
+      <List id="scrollTarget" className={classes.root}>{postsArray()}</List>
+      <BottomAppBar
+        room={room}
+        socket={props.socket}
+        isLoadingRoom={isLoadingRoom}
+        xOffSet={props.xOffSet}
+      />
     </div>
   );
 }

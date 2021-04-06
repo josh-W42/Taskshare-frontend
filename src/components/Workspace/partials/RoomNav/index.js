@@ -88,19 +88,7 @@ const RoomNav = (props) => {
       <div className={classes.grow}>
         <AppBar className={classes.appBar} color="default" position="fixed">
           <Toolbar>
-            <Typography variant="h6" noWrap>
-                <Skeleton variant="rect" width={200} height={40} />
-            </Typography>
-            <div className={classes.grow} />
-            <div className={classes.sectionDesktop}>
-              <Skeleton className="mx-1" variant="rect" width={200} height={40} />
-              <Skeleton className="mx-1" variant="circle" width={40} height={40} />
-              <Skeleton className="mx-1" variant="circle" width={40} height={40} />
-              <Skeleton className="mx-1" variant="circle" width={40} height={40} />
-            </div>
-            <div className={classes.sectionMobile}>
-              <Skeleton variant="circle" width={40} height={40} />
-            </div>
+            <Skeleton className="w-100" variant="rect" height={68} />
           </Toolbar>
         </AppBar>
       </div>

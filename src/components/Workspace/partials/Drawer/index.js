@@ -122,6 +122,8 @@ const ResponsiveDrawer = (props) => {
     setDirectMessages(messages);
   }
 
+
+
   const roomArray = rooms.map((room, index) => {
 
     if (props.isLoadingWorkspace) {
@@ -137,7 +139,7 @@ const ResponsiveDrawer = (props) => {
           <Grid container justify="space-between" alignItems="center">
             <Grid item>
               <ListItemIcon>
-                <Badge badgeContent={0} color="secondary">
+                <Badge badgeContent={room.newNotifications ? room.newNotifications : 0} color="secondary">
                   {
                     room.isPrivate ? (
                       <VisibilityOffIcon />
@@ -171,7 +173,7 @@ const ResponsiveDrawer = (props) => {
       <ListItem key={`messageRoom-${index}`} button className={classes.nested}>
         <ListItemIcon>
           <Badge badgeContent={index + 1} color="secondary">
-            <NavAvatar />
+            <NavAvatar socket={props.socket} member={props.member} />
           </Badge>
           {/* <AvatarGroup max={1}>
             <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
@@ -191,6 +193,12 @@ const ResponsiveDrawer = (props) => {
   const drawer = (
     <div>
       <div className={classes.toolbar} />
+      <Button>
+        <LightDarkSwitch
+          setDarkModeEnabled={props.setDarkModeEnabled}
+          darkModeEnabled={props.darkModeEnabled}
+        />
+      </Button>
       <Divider />
       { props.isLoadingWorkspace ? (
         <ListItem>
@@ -229,38 +237,44 @@ const ResponsiveDrawer = (props) => {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <AppBar color="inherit" position="fixed" className={classes.appBar}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            className={classes.menuButton}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Grid item xs={9} sm={6} md={6}>
-            <Typography variant="h6" noWrap>
-              {props.isLoadingWorkspace ? (
-                <Skeleton variant="rect" width={200} height={25} />
-              ) : (
-                props.workspace.name
-              )}
-            </Typography>
-          </Grid>
-          <Hidden xsDown>
-            <Grid item xs={3} sm={6} md={5}>
-              <SearchBar />
-            </Grid>
-          </Hidden>
-          <Hidden smDown>
-            <Grid item xs={1}>
-              <NavAvatar socket={props.socket} />
-            </Grid>
-          </Hidden>
-        </Toolbar>
-      </AppBar>
+      {
+        props.isLoadingWorkspace ? (
+          <AppBar color="inherit" position="fixed" className={classes.appBar}>
+            <Toolbar>
+              <Skeleton className="w-100" variant="rect" height={35} />
+            </Toolbar>
+          </AppBar>
+        ) : (
+          <AppBar color="inherit" position="fixed" className={classes.appBar}>
+            <Toolbar>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="start"
+                onClick={handleDrawerToggle}
+                className={classes.menuButton}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Grid item xs={9} sm={6} md={6}>
+                <Typography variant="h6" noWrap>
+                  {props.workspace.name}
+                </Typography>
+              </Grid>
+              <Hidden xsDown>
+                <Grid item xs={3} sm={6} md={5}>
+                  <SearchBar />
+                </Grid>
+              </Hidden>
+              <Hidden smDown>
+                <Grid item xs={1}>
+                  <NavAvatar socket={props.socket} member={props.member} />
+                </Grid>
+              </Hidden>
+            </Toolbar>
+          </AppBar>
+        )
+      }
       <nav className={classes.drawer} aria-label="mailbox folders">
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Hidden smUp implementation="css">
@@ -288,10 +302,6 @@ const ResponsiveDrawer = (props) => {
             variant="permanent"
             open
           >
-            <LightDarkSwitch
-              setDarkModeEnabled={props.setDarkModeEnabled}
-              darkModeEnabled={props.darkModeEnabled}
-            />
             {drawer}
           </Drawer>
         </Hidden>

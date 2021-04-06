@@ -26,7 +26,6 @@ const { REACT_APP_SERVER_URL, REACT_APP_SOCKET_URL } = process.env;
 
 // Sockets
 const socket = io(REACT_APP_SOCKET_URL, {
-  autoConnect: false,
   reconnectionAttempts: 10,
   reconnectionDelay: 10000,
   reconnectionDelayMax: 10000,
@@ -154,9 +153,6 @@ function App() {
       token = jwt_decode(localToken);
       setAuthToken(localToken);
       nowCurrentUser(token);
-      if (!socket.connected) {
-        socket.connect();
-      }
     }
   }, []);
 
@@ -194,10 +190,6 @@ function App() {
       setIsAuthenticated(true);
 
       setIsLoadingData(false);
-
-      if (!socket.connected) {
-        socket.connect();
-      }
     } catch (error) {
       console.log("===> Error When Getting User Data", error);
       createNotification("error", "Could Not Connect With DataBase, Safely Logging You Out.");
