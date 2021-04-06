@@ -188,8 +188,12 @@ function App() {
       let user = response.data.result;
       setCurrentUser(user);
       setIsAuthenticated(true);
-
       setIsLoadingData(false);
+
+      if (!socket.connected) {
+        socket.connect();
+      }
+
     } catch (error) {
       console.log("===> Error When Getting User Data", error);
       createNotification("error", "Could Not Connect With DataBase, Safely Logging You Out.");
